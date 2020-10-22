@@ -1,0 +1,36 @@
+<policies>
+    <inbound>
+        <base />
+        <choose>
+            <when condition="@(context.Request.MatchedParameters.ContainsKey("orderId"))">
+                <choose>
+                    <when condition="@(!(new Regex("^[0-9]{12}$", RegexOptions.IgnoreCase).Match(context.Request.MatchedParameters.GetValueOrDefault("orderId","")).Success))">
+                        <return-response>
+                            <set-status code="400" reason="Order ID has an invalid format" />
+                            <set-body />
+                        </return-response>
+                    </when>
+                </choose>
+            </when>
+            <when condition="@(context.Request.MatchedParameters.ContainsKey("orderGuid"))">
+                <choose>
+                    <when condition="@(!(Guid.TryParse(context.Request.MatchedParameters.GetValueOrDefault("orderGuid",""), out _)))">
+                        <return-response>
+                            <set-status code="400" reason="Order GUID has an invalid format" />
+                            <set-body />
+                        </return-response>
+                    </when>
+                </choose>
+            </when>
+        </choose>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
